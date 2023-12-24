@@ -2,10 +2,10 @@
 
 // exported macros
 #define ARGS_(list) list
-#define va_init(a,b) va_start(a,b)
+#define va_init(a, b) va_start(a, b)
 
 // typedefs
-// #include "config.h"
+#include "config.h"
 // interfaces (page 78)
 // exported types
 // exported data
