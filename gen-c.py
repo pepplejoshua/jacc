@@ -4,9 +4,13 @@ import datetime
 year = datetime.datetime.now().year
 module = f"""#include "c.h"
 // macros
+
 // types
+
 // prototypes
+
 // data
+
 // functions
 """
 
@@ -14,11 +18,17 @@ module_begin_path = "./src/"
 
 header = """
 // exported macros
+
 // typedefs
+
 #include "config.h"
+
 // interfaces (page 78)
+
 // exported types
+
 // exported data
+
 // exported functions
 """
 
@@ -32,7 +42,7 @@ if __name__ == "__main__":
     if len(sys_args) < 1:
         print("No arguments given")
         sys.exit(1)
-    
+
     type_ = 0
     output = None
 
