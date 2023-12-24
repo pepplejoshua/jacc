@@ -17,5 +17,9 @@
   // turn off format on type
   "editor.formatOnType": false,
   // turn on format on save
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  // turn on folding
+  "editor.folding": true,
+  // for Vc Format, keep else on same line as }
+  "C_Cpp.vcFormat.newLine.beforeElse": false
 }

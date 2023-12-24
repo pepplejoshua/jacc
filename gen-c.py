@@ -3,33 +3,33 @@ import datetime
 
 year = datetime.datetime.now().year
 module = f"""#include "c.h"
-// macros
+// MACROS
 
-// types
+// TYPES
 
-// prototypes
+// PROTOTYPES
 
-// data
+// DATA
 
-// functions
+// FUNCTIONS
 """
 
 module_begin_path = "./src/"
 
 header = """
-// exported macros
+// MACROS
 
-// typedefs
+// TYPEDEFS
 
 #include "config.h"
 
-// interfaces (page 78)
+// INTERFACES (page 78)
 
-// exported types
+// TYPES
 
-// exported data
+// DATA
 
-// exported functions
+// FUNCTIONS
 """
 
 header_begin_path = "./include/"
