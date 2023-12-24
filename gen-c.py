@@ -68,3 +68,19 @@ if __name__ == "__main__":
         else:
             with open(module_begin_path + output + '.c', "w") as f:
                 f.write(module)
+
+
+
+# EXPECTED FILES
+# ch 1 = c.h
+# ch 2, 3, 4 = alloc.c string.c sym.c types.c list.c
+# ch 5 = ops.h bind.c null.c symbolic.c
+# ch 6 = token.h input.c lex.c output.c
+# ch 7, 8, 9, 10, 11 = error.c expr.c tree.c enode.c expr.c simp.c stmt.c decl.c main.c init.c
+# ch 12 = dag.c
+# _____ = event.c trace.c prof.c profio.c
+# ch 13 = config.h
+# ch 13, 14, 15 = gen.c
+# ch 16 = mips.md
+# ch 17 = sparc.md
+# ch 18 = x86.md
