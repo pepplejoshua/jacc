@@ -1,0 +1,21 @@
+{
+  "files.associations": {
+    "*.h": "c",
+    "*.c": "c",
+    "*.py": "python"
+  },
+  // set tab size to 2 spaces for this project
+  "editor.tabSize": 2,
+  // set spaces instead of tabs
+  "editor.insertSpaces": true,
+  // trim trailing whitespace
+  "files.trimTrailingWhitespace": true,
+  // turn off detect indentation
+  "editor.detectIndentation": false,
+  // turn off format on paste
+  "editor.formatOnPaste": false,
+  // turn off format on type
+  "editor.formatOnType": false,
+  // turn on format on save
+  "editor.formatOnSave": true
+}
