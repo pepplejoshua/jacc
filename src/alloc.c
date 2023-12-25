@@ -50,9 +50,12 @@ void *allocate(unsigned long n, unsigned a) {
     ap->next = free_blocks;
     if (ap->next != NULL) { // there is at least 1 free mem block
       free_blocks = free_blocks->next; // move the first free block to the next free block
-      ap = ap->next;
+      ap = ap->next; // move the ap pointer to the new block
     } else {
       // allocate new mem block
+      // sizeof(union header) is the size of the header of the block
+      // the header stores metadata about the block like the size of the block,
+      // the next block, etc.
       unsigned m = sizeof(union header) + n + 10 * 1024; // 10KB
       ap->next = malloc(m); // allocate the memory
       ap = ap->next; // move the ap pointer to the new block
@@ -60,9 +63,11 @@ void *allocate(unsigned long n, unsigned a) {
         error("insufficient memmory\n");
         exit(1);
       }
-      ap->limit = (char *)ap + m; // set the limit of the block
+      ap->limit = (char *)ap + m; // set the limit of the block to starting addr + size of block
     }
-    ap->avail = (char *)((union header *)ap + 1); // set the avail of the block
+    // set the avail of the block to the point right after the header of the block
+    // the header is of size sizeof(union header)
+    ap->avail = (char *)((union header *)ap + 1);
     ap->next = NULL; // set the next of the block to NULL since it is the last block
     arena[a] = ap; // set the arena to the new block
   }
