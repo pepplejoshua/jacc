@@ -37,12 +37,12 @@ extern void deallocate ARGS((unsigned a));
 extern void *new_array ARGS((unsigned long m, unsigned long n, unsigned a));
 
 // DATA
-static struct mem_block first[] = { { NULL }, { NULL }, { NULL } }, *arena[] = { &first[0], &first[1], &first[2] };
+static struct mem_block first[] = { { NULL }, { NULL }, { NULL } }, *arenas[] = { &first[0], &first[1], &first[2] };
 static struct mem_block *free_blocks;
 
 // FUNCTIONS
 void *allocate(unsigned long n, unsigned a) {
-  struct mem_block *ap = arena[a];
+  struct mem_block *ap = arenas[a];
   // round up n to align it properly in memory
   n = roundup(n, sizeof(union align));
   while (ap->avail + n > ap->limit) {
@@ -69,17 +69,25 @@ void *allocate(unsigned long n, unsigned a) {
     // the header is of size sizeof(union header)
     ap->avail = (char *)((union header *)ap + 1);
     ap->next = NULL; // set the next of the block to NULL since it is the last block
-    arena[a] = ap; // set the arena to the new block
+    arenas[a] = ap; // set the arena to the new block
   }
   ap->avail += n; // move the avail pointer to the next free location
   return ap->avail - n; // return the location of the allocated memory
 }
 
 void deallocate(unsigned a) {
-  arena[a]->next = free_blocks; // set the next of the arena to the first free block
-  free_blocks = first[a].next; // set the first free block to the arena
-  first[a].next = NULL; // set the next of the first block to NULL since it is the last block
-  arena[a] = &first[a]; // set the arena to the first block
+  while (arenas[a]->next != NULL) { // while there are more blocks in the arena
+    arenas[a] = arenas[a]->next; // move the arena pointer to the next block
+  }
+  // set the next pointer of the last block to the first free block
+  arenas[a]->next = free_blocks;
+  // let the free blocks now start from the first block of this arena, effectively
+  // freeing all the blocks in the arena for reuse
+  free_blocks = first[a].next;
+  // set the next of the first block to NULL since it is the last block
+  first[a].next = NULL;
+  // set the arena to the first block
+  arenas[a] = &first[a];
 }
 
 void *new_array(unsigned long m, unsigned long n, unsigned a) {
