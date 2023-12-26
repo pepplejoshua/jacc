@@ -4,9 +4,11 @@ jacc is `just another c compiler` written in c. I follow the book: Retargetable 
 
 ## Learnings
 
-### trying to understand arena allocators with ChatGPT and some festive reasoning
+---
 
-Merry Christmas. So far in `alloc.c` (chapter 2), a few things have confused me. But with a combination of [this wonderful blog post](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator) by Ryan Fleury, [ChatGPT4](https://chat.openai.com/share/cbc113ed-e06f-40bc-be80-dbd3765dcff5), near constant thinking, I have come to a better understanding of this code:
+### Trying to understand arena allocators with ChatGPT and some festive reasoning [2023-12-25]
+
+Merry Christmas. So far in [alloc.c](https://github.com/pepplejoshua/jacc/blob/master/src/alloc.c) (chapter 2 of book), a few things have confused me. But with a combination of [this wonderful blog post](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator) by Ryan Fleury, [ChatGPT-4 conversation](https://chat.openai.com/share/cbc113ed-e06f-40bc-be80-dbd3765dcff5) and near constant thinking about what the code meant, I have come to a better understanding of this code:
 
 ```c
 void *allocate(unsigned long n, unsigned a) {
@@ -24,7 +26,7 @@ void *allocate(unsigned long n, unsigned a) {
       // sizeof(union header) is the size of the header of the block
       // the header stores metadata about the block like the size of the block,
       // the next block, etc.
-      unsigned m = sizeof(union header) + n + 10 * 1024; // 10KB
+      unsigned m = sizeof(union header) + n + 10 * 1024; // 24 bytes (on my 64-bit computer) + n bytes + 10240 bytes
       ap->next = malloc(m); // allocate the memory
       ap = ap->next; // move the ap pointer to the new block
       if (ap == NULL) {
@@ -59,7 +61,12 @@ void deallocate(unsigned a) {
 }
 ```
 
-Let me preface with: I have never used a memory allocator that is not `new` and `free` before so there is a lot going on with this code above. Initially, I thought `struct mem_block` would hold the memory directly (I am not sure how to explain this. Like it would `malloc` an array of the memory or a `char *` and do stuff with it?). Instead, it imprints onto the memory, making itself a part of the memory it is managing. Very neat (and confusing at first). The memory is allocated using `malloc` (where `m` is the size of the entire memory block of the struct mem_block, part of which is allocatable [mem_block.limit - mem_block.avail]). The struct pointer is set to the start of the memory block and the size of the memory block, `m`, is derived from adding the size of the header (we are accounting for space for the different pointers we will imprint to manage the memory block) + `n`, which is the memory-aligned number of bytes we need to allocate + 10,240 extra bytes for future allocations. This idea of a `header` is still confusing.
+Let me preface with:
+
+- I have never used a memory allocator that is not `new` and `free`, and
+- I have never used C/C++ to do a lot of the magic in this code before.
+
+So there is a lot going on with this code above. Initially, I thought `struct mem_block` would hold the memory directly (I am not sure how to explain this. Like it would `malloc` an array of the memory or a `char *` and do stuff with it?). Instead, it imprints onto the memory, making itself a part of the memory it is managing. Very neat (and confusing at first). The memory is allocated using `malloc` (where `m` is the size of the entire memory block of the struct mem_block, part of which is allocatable [mem_block.limit - mem_block.avail]). The struct pointer is set to the start of the memory block and the size of the memory block, `m`, is derived from adding the size of the header (we are accounting for space for the different pointers we will imprint to manage the memory block) + `n`, which is the memory-aligned number of bytes we need to allocate + 10,240 extra bytes for future allocations. This idea of a `header` is still confusing.
 
 After allocating _m_ bytes with `malloc` and setting the current arena to the start of the memory block, we can easily get the limit of this memory block by adding `m` to the start of the memory block (after casting it to a `char *`, which is essentially making it a pointer to a char, which is a byte). Adding `m` to a `char *` will move it `m` bytes forward, which is the limit of the memory block. Again, very neat. Now we need to compute the second member of `struct mem_block`, `avail`. This is done by adding the size of the header to the start of the memory block. This is because the header is the first thing in the memory block, so adding the size of the header to the start of the memory block will give us the start of the allocatable memory. We then set the `avail`pointer to this location. We then set the`next`pointer to`NULL` since this is the last block in the arena. We then set the arena to this block.
 
@@ -122,3 +129,5 @@ Ignore the fact that the code could have potentially reused block `*2` from `are
 the `next` pointer of the block you just grabbed from `free_blocks` to `NULL` since it is now the last block in `arenas[i]`.
 
 I dare say this is the most beautiful piece of code I have ever read and understood.
+
+---

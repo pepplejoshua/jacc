@@ -56,7 +56,7 @@ void *allocate(unsigned long n, unsigned a) {
       // sizeof(union header) is the size of the header of the block
       // the header stores metadata about the block like the size of the block,
       // the next block, etc.
-      unsigned m = sizeof(union header) + n + 10 * 1024; // 10KB
+      unsigned m = sizeof(union header) + n + 10 * 1024; // 24 bytes (on my 64-bit computer) + n bytes + 10240 bytes
       ap->next = malloc(m); // allocate the memory
       ap = ap->next; // move the ap pointer to the new block
       if (ap == NULL) {
