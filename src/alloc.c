@@ -3,6 +3,7 @@
 // MACROS
 #define NEW(p, a) ((p) = allocate(sizeof *(p), (a)))
 #define NEW0(p, a) memset(NEW((p), (a)), 0, sizeof *(p))
+#define mem_align(x) roundup(x, sizeof(union align))
 
 // TYPES
 struct mem_block {
@@ -70,7 +71,7 @@ void *allocate(unsigned long n, unsigned a) {
   assert(n > 0);
   struct mem_block *ap = arenas[a];
   // round up n to align it properly in memory
-  n = roundup(n, sizeof(union align));
+  n = mem_align(n);
   while (ap->avail + n > ap->limit) {
     // get new block from either free blocks or by allocating one
     ap->next = free_blocks;
@@ -82,7 +83,7 @@ void *allocate(unsigned long n, unsigned a) {
       // sizeof(union header) is the size of the header of the block
       // the header stores metadata about the block like the size of the block,
       // the next block, etc.
-      unsigned m = sizeof(union header) + n + 10 * 1024; // 24 bytes (on my 64-bit computer) + n bytes + 10240 bytes
+      unsigned m = sizeof(union header) + n + mem_align(10 * 1024); // 24 bytes (on my 64-bit computer) + n bytes + at least 10240 bytes
       ap->next = malloc(m); // allocate the memory
       ap = ap->next; // move the ap pointer to the new block
       reportNull(ap, "insufficient memory\n");
