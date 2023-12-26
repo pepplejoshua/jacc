@@ -122,5 +122,3 @@ Ignore the fact that the code could have potentially reused block `*2` from `are
 the `next` pointer of the block you just grabbed from `free_blocks` to `NULL` since it is now the last block in `arenas[i]`.
 
 I dare say this is the most beautiful piece of code I have ever read and understood.
-
-Find my ChatGPT chat [here]().
