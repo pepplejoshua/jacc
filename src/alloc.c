@@ -1,4 +1,5 @@
 #include "c.h"
+
 // MACROS
 #define NEW(p, a) ((p) = allocate(sizeof *(p), (a)))
 #define NEW0(p, a) memset(NEW((p), (a)), 0, sizeof *(p))
@@ -41,6 +42,7 @@ static struct mem_block first[] = { { NULL }, { NULL }, { NULL } }, *arenas[] = 
 static struct mem_block *free_blocks;
 
 // FUNCTIONS
+
 void *allocate(unsigned long n, unsigned a) {
   struct mem_block *ap = arenas[a];
   // round up n to align it properly in memory

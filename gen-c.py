@@ -3,6 +3,7 @@ import datetime
 
 year = datetime.datetime.now().year
 module = f"""#include "c.h"
+
 // MACROS
 
 // TYPES

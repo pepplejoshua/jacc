@@ -6,7 +6,8 @@
 #define NULL ((void*)0) // machine-independent expression of a nullptr
 #define nullptr NULL // ditto
 
-#define len(a) ((int) (sizeof (a) / sizeof ((a)[0]))) // returns the length of an array by dividing the overall size by the size of one elem
+// returns the length of an array by dividing the overall size by the size of one elem
+#define NELEMS(a) ((int) (sizeof (a) / sizeof ((a)[0])))
 // `((x) + ((n) - 1))` adds `n - 1` to `x`.
 // This ensures that if `x` is not already a multiple of `n`, it will be increased to the next multiple of `n`.
 // If `x` is already a multiple of `n`, it will not be changed.
@@ -25,5 +26,6 @@
 
 // interfaces (page 78)
 // exported types
+enum { PERM = 0, FUNC, STMT };
 // exported data
 // exported functions
