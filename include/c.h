@@ -29,3 +29,9 @@
 enum { PERM = 0, FUNC, STMT };
 // exported data
 // exported functions
+void reportNull(void *cand, char *msg) {
+  if (cand == NULL) {
+    error(msg);
+    exit(1);
+  }
+}

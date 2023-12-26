@@ -21,12 +21,6 @@ union header {
   union align a;
 };
 
-// debugging implementation using malloc and free
-#ifdef PURIFY
-
-#else
-// manual implementation
-
 // PROTOTYPES
 // used in the form
 // struct T *p; (where T is the shape of the struct)
@@ -37,6 +31,34 @@ extern void deallocate ARGS((unsigned a));
 // m is the size of the type in bytes, n is the size of the array, a is the arena id
 extern void *new_array ARGS((unsigned long m, unsigned long n, unsigned a));
 
+// debugging implementation using malloc and free
+#ifdef PURIFY
+union header *arenas[3];
+
+void *allocate(unsigned long n, unsigned a) {
+  assert(a < NELEMS(arenas));
+  union header *n_header = malloc(sizeof * n_header + n); // allocate space for header and n bytes
+  reportNull(n_header, "insufficient memory\n");
+  n_header->b.next = (void *)arenas[a]; // point to current start of arena
+  arenas[a] = n_header; // make new block start of arena
+  return n_header + 1; // increment to the start of the memory
+}
+
+void deallocate(unsigned a) {
+  // 2 blocks working in tandem to delete all the blocks
+  // in an arena
+  union header *p, *q;
+
+  assert(a < NELEMS(arenas));
+  // start at the most recently allocated block till p is NULL
+  // and update p with the value of q
+  for (p = arenas[a]; p; p = q) {
+    q = (void *)p->b.next; // get the next pointer for p and set it to q (so we can process it next)
+    free(p); // delete p block
+  }
+  arenas[a] = NULL; // reset state of arena
+}
+#else
 // DATA
 static struct mem_block first[] = { { NULL }, { NULL }, { NULL } }, *arenas[] = { &first[0], &first[1], &first[2] };
 static struct mem_block *free_blocks;
@@ -44,6 +66,8 @@ static struct mem_block *free_blocks;
 // FUNCTIONS
 
 void *allocate(unsigned long n, unsigned a) {
+  assert(a < NELEMS(arenas));
+  assert(n > 0);
   struct mem_block *ap = arenas[a];
   // round up n to align it properly in memory
   n = roundup(n, sizeof(union align));
@@ -61,10 +85,7 @@ void *allocate(unsigned long n, unsigned a) {
       unsigned m = sizeof(union header) + n + 10 * 1024; // 24 bytes (on my 64-bit computer) + n bytes + 10240 bytes
       ap->next = malloc(m); // allocate the memory
       ap = ap->next; // move the ap pointer to the new block
-      if (ap == NULL) {
-        error("insufficient memmory\n");
-        exit(1);
-      }
+      reportNull(ap, "insufficient memory\n");
       ap->limit = (char *)ap + m; // set the limit of the block to starting addr + size of block
     }
     // set the avail of the block to the point right after the header of the block
@@ -91,8 +112,8 @@ void deallocate(unsigned a) {
   // set the arena to the first block
   arenas[a] = &first[a];
 }
+#endif
 
 void *new_array(unsigned long m, unsigned long n, unsigned a) {
   return allocate(m * n, a); // allocate m * n bytes of memory
 }
-#endif
