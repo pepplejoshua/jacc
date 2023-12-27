@@ -4,10 +4,6 @@
 
 // types
 
-// prototypes
-extern void outs ARGS((char *));
-extern void print ARGS((char *, ...));
-
 // data
 // functions
 // void outs(char *s) {

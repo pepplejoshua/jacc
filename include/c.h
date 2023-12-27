@@ -6,6 +6,37 @@
 #define NULL ((void*)0) // machine-independent expression of a nullptr
 #define nullptr NULL // ditto
 
+// prototypes implemented across files
+// alloc.c
+// used in the form
+// struct T *p; (where T is the shape of the struct)
+// p = allocate(sizeof *p, a);
+extern void *allocate ARGS((unsigned long n, unsigned a)); // where n is the number of bytes and a is the arena id
+// where a is the arena id
+extern void deallocate ARGS((unsigned a));
+// m is the size of the type in bytes, n is the size of the array, a is the arena id
+extern void *new_array ARGS((unsigned long m, unsigned long n, unsigned a));
+
+// list.c
+// append a List node containing x to list's chain
+extern List append ARGS((anytype x, List list));
+// get the length of the list
+extern int len ARGS((List list));
+// convert a list to a null terminated array allocated in arena a and deallocate it
+extern anytype LtoV ARGS((List *list, unsigned a));
+
+// output.c
+extern void outs ARGS((char *));
+extern void print ARGS((char *, ...));
+
+// string.c
+// makes a copy of a null terminated string
+extern char *string ARGS((char *));
+// makes a copy of the len bytes in the string
+extern char *stringn ARGS((char *, int len));
+// takes an integer, converts it to a string and makes a copy of it
+extern char *stringd ARGS((int));
+
 // returns the length of an array by dividing the overall size by the size of one elem
 #define NELEMS(a) ((int) (sizeof (a) / sizeof ((a)[0])))
 // `((x) + ((n) - 1))` adds `n - 1` to `x`.
@@ -21,6 +52,7 @@
 #define va_init(a, b) va_start(a, b)
 
 // typedefs
+typedef void *anytype;
 
 #include "config.h"
 

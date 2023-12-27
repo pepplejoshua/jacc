@@ -8,8 +8,6 @@ module = f"""#include "c.h"
 
 // TYPES
 
-// PROTOTYPES
-
 // DATA
 
 // FUNCTIONS

@@ -23,14 +23,6 @@ union header {
 };
 
 // PROTOTYPES
-// used in the form
-// struct T *p; (where T is the shape of the struct)
-// p = allocate(sizeof *p, a);
-extern void *allocate ARGS((unsigned long n, unsigned a)); // where n is the number of bytes and a is the arena id
-// where a is the arena id
-extern void deallocate ARGS((unsigned a));
-// m is the size of the type in bytes, n is the size of the array, a is the arena id
-extern void *new_array ARGS((unsigned long m, unsigned long n, unsigned a));
 
 // debugging implementation using malloc and free
 #ifdef PURIFY

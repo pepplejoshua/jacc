@@ -5,15 +5,6 @@
 
 // TYPES
 
-// PROTOTYPES
-
-// makes a copy of a null terminated string
-extern char *string ARGS((char *));
-// makes a copy of the len bytes in the string
-extern char *stringn ARGS((char *, int len));
-// takes an integer, converts it to a string and makes a copy of it
-extern char *stringd ARGS((int));
-
 // DATA
 static struct string {
   char *str;
