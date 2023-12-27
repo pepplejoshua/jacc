@@ -1,14 +1,5 @@
 #include "c.h"
 
-// MACROS
-
-// TYPES
-struct list {
-  anytype x;
-  List link;
-};
-typedef struct list *List;
-
 // DATA
 static List free_nodes;
 

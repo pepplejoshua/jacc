@@ -6,8 +6,6 @@ module = f"""#include "c.h"
 
 // MACROS
 
-// TYPES
-
 // DATA
 
 // FUNCTIONS
