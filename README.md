@@ -1,6 +1,13 @@
 # jacc
 
-jacc is `just another c compiler` written in c. I follow the book: Retargetable C Compiler: A Design and Implementation by David R. Hanson and Christopher W. Fraser. I will try to implement all the features in the book in this private repository.
+jacc is `just another c compiler` written in C. I follow the book: Retargetable C Compiler: A Design and Implementation by David R. Hanson and Christopher W. Fraser. I will try to implement all the features in the book in this repository. I want to complete the book (and the implementation) and then:
+
+- a couple other new backends (LC-3, etc.)
+- FFI or even some form of one way interop with my [proto](https://github.com/pepplejoshua/proto) project.
+- linter and formatter for ANSI C
+- maybe it isn't hell enough, we can try to implement the more modern features of C (C99, C11, C17, etc.) in zig or something.
+
+I expect this to be difficult, but I also know it will be more difficult than I expect.
 
 ## Learnings
 
