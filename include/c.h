@@ -1,7 +1,6 @@
 #include <stdarg.h>
 
 // exported macros
-#define ARGS(list) list
 #define VARARGS(newlist, oldlist, olddecls) newlist
 #define NULL ((void*)0) // machine-independent expression of a nullptr
 #define nullptr NULL // ditto
@@ -12,15 +11,19 @@
 // used in the form
 // struct T *p; (where T is the shape of the struct)
 // p = allocate(sizeof *p, a);
-extern void *allocate ARGS((unsigned long n, unsigned a)); // where n is the number of bytes and a is the arena id
+extern void *allocate(unsigned long n, unsigned a); // where n is the number of bytes and a is the arena id
 // where a is the arena id
-extern void deallocate ARGS((unsigned a));
+extern void deallocate(unsigned a);
 // m is the size of the type in bytes, n is the size of the array, a is the arena id
-extern void *new_array ARGS((unsigned long m, unsigned long n, unsigned a));
+extern void *new_array(unsigned long m, unsigned long n, unsigned a);
 // macros
 #define NEW(p, a) ((p) = allocate(sizeof *(p), (a)))
 #define NEW0(p, a) memset(NEW((p), (a)), 0, sizeof *(p))
 #define mem_align(x) roundup(x, sizeof(union align))
+
+
+// lex.c
+extern Coordinate src;
 
 
 // list.c
@@ -31,23 +34,26 @@ struct list {
 typedef struct list *List;
 
 // append a List node containing x to list's chain
-extern List append ARGS((anytype x, List list));
+extern List append(anytype x, List list);
 // get the length of the list
-extern int len ARGS((List list));
+extern int len(List list);
 // convert a list to a null terminated array allocated in arena a and deallocate it
-extern anytype LtoV ARGS((List *list, unsigned a));
+extern anytype LtoV(List *list, unsigned a);
+
 
 // output.c
-extern void outs ARGS((char *));
-extern void print ARGS((char *, ...));
+extern void outs(char *);
+extern void print(char *, ...);
+
 
 // string.c
 // makes a copy of a null terminated string
-extern char *string ARGS((char *));
+extern char *string(char *);
 // makes a copy of the len bytes in the string
-extern char *stringn ARGS((char *, int len));
+extern char *stringn(char *, int len);
 // takes an integer, converts it to a string and makes a copy of it
-extern char *stringd ARGS((int));
+extern char *stringd(int);
+
 
 // sym.c
 enum { CONSTANTS = 1, LABELS, GLOBAL, PARAM, LOCAL }; // SCOPE of symbol
@@ -59,10 +65,16 @@ struct symbol {
   List uses; // keeps track of all the uses of this sym through a list of Coordinates
   int sclass; // keeps track of a symbols extended storage class (AUTO | REGISTER | STATIC | EXTERN)
   // symbol flags (p 50)
+  unsigned temporary : 1;
+  unsigned generated : 1;
   Type type; // type of the symbol if any
   float ref; // for some symbols, this estimates the number of times a variable is referenced
   union {
-    // labels (p 46)
+    // specific to labels (p 46)
+    struct {
+      int label;
+      Symbol equatedTo;
+    } label_info;
     // struct types (p 65)
     // enum constants (p 69)
     // enum types (p 68)
@@ -70,7 +82,7 @@ struct symbol {
     // function symbols (p 290)
     // globals (p 265)
     // temporaries (p 346)
-  } u;
+  } additional_info;
   XSymbol x;
   // debugger extensions
 };
@@ -95,6 +107,16 @@ extern Table globals; // file scoped ids
 extern Table identifiers; // ordinary ids
 extern Table labels; // compiler defined internal labels
 extern Table types; // type tags
+extern int level;
+
+extern Table new_table(Table, int);
+extern void foreach(Table, int, void(*)(Symbol, void *), void *);
+extern void enterScope();
+extern void exitScope();
+extern Symbol install(char *, Table *, int, int);
+extern Symbol lookup(char *, Table tp);
+extern int genLabel(int);
+extern Symbol findLabel(int);
 
 // types.c
 struct type {};

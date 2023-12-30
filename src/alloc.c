@@ -10,7 +10,7 @@ union align {
   long l;
   char *p;
   double d;
-  int(*f) ARGS((void));
+  int(*f)(void);
 };
 union header {
   struct mem_block b;
