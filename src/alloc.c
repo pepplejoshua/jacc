@@ -1,10 +1,5 @@
 #include "c.h"
 
-// MACROS
-#define NEW(p, a) ((p) = allocate(sizeof *(p), (a)))
-#define NEW0(p, a) memset(NEW((p), (a)), 0, sizeof *(p))
-#define mem_align(x) roundup(x, sizeof(union align))
-
 // TYPES
 struct mem_block {
   struct mem_block *next; // next memory block in the arena

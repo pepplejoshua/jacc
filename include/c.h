@@ -7,6 +7,7 @@
 #define nullptr NULL // ditto
 
 // prototypes and types implemented across files
+
 // alloc.c
 // used in the form
 // struct T *p; (where T is the shape of the struct)
@@ -16,6 +17,11 @@ extern void *allocate ARGS((unsigned long n, unsigned a)); // where n is the num
 extern void deallocate ARGS((unsigned a));
 // m is the size of the type in bytes, n is the size of the array, a is the arena id
 extern void *new_array ARGS((unsigned long m, unsigned long n, unsigned a));
+// macros
+#define NEW(p, a) ((p) = allocate(sizeof *(p), (a)))
+#define NEW0(p, a) memset(NEW((p), (a)), 0, sizeof *(p))
+#define mem_align(x) roundup(x, sizeof(union align))
+
 
 // list.c
 struct list {
@@ -83,6 +89,12 @@ struct table {
   } *buckets[256];
   Symbol all;
 };
+extern Table constants;
+extern Table externals; // externed ids
+extern Table globals; // file scoped ids
+extern Table identifiers; // ordinary ids
+extern Table labels; // compiler defined internal labels
+extern Table types; // type tags
 
 // types.c
 struct type {};
@@ -109,7 +121,7 @@ typedef void *anytype;
 
 // interfaces (page 78)
 // exported types
-enum { PERM = 0, FUNC, STMT };
+enum { PERM = 0, FUNC, STMT }; // which arena to use?
 // exported data
 // exported functions
 void reportNull(void *cand, char *msg) {
