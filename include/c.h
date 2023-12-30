@@ -74,11 +74,15 @@ struct symbol {
     struct {
       int label;
       Symbol equatedTo;
-    } label_info;
+    } label_info; // l in lcc
     // struct types (p 65)
     // enum constants (p 69)
     // enum types (p 68)
     // constants (p 47)
+    struct {
+      Value val;
+      Symbol loc; // sym for generated variable, if any
+    } constant_info; // c in lcc
     // function symbols (p 290)
     // globals (p 265)
     // temporaries (p 346)
@@ -92,6 +96,17 @@ typedef struct coord {
   unsigned x, y; // y is line and x is column in line where it starts
 } Coordinate;
 typedef struct table *Table;
+typedef union value {
+  /* signed */ char sc;
+  short ss;
+  int i;
+  unsigned char uc;
+  unsigned short us;
+  unsigned int u;
+  float f;
+  double d;
+  void *p;
+} Value;
 struct table {
   int level;
   Table previous;
@@ -117,9 +132,12 @@ extern Symbol install(char *, Table *, int, int);
 extern Symbol lookup(char *, Table tp);
 extern int genLabel(int);
 extern Symbol findLabel(int);
+extern Symbol constant(Type, Value);
 
 // types.c
-struct type {};
+struct type {
+  int op;
+};
 typedef struct type *Type;
 
 // returns the length of an array by dividing the overall size by the size of one elem

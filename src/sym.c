@@ -132,3 +132,5 @@ Symbol findLabel(int lab) {
   // update label specific info
   p->sym.generated = 1;
 }
+
+Symbol constant(Type ty, Value v) {}
