@@ -2,6 +2,7 @@
 
 // MACROS
 #define HASHSIZE NELEMS(((Table)0)->buckets)
+#define equalp(x) v.x == p->sym.additional_info.constant_info.val.x
 
 // DATA
 static struct table cns = { CONSTANTS },
@@ -133,4 +134,64 @@ Symbol findLabel(int lab) {
   p->sym.generated = 1;
 }
 
-Symbol constant(Type ty, Value v) {}
+Symbol constant(Type ty, Value v) {
+  struct entry *p;
+  unsigned h = v.u & (HASHSIZE - 1);
+
+  // unequal returns the unqualified version of a type
+  // i.e. without volatile or const.
+  ty = unequal(ty);
+  for (p = constants->buckets[h]; p; p = p->link) {
+    if (eqtype(ty, p->sym.type, 1)) {
+      // return the symbol if p's value == v's
+      switch (ty->op) {
+      case CHAR: {
+        if (equalp(uc)) return &p->sym;
+        break;
+      }
+      case SHORT: {
+        if (equalp(ss)) return &p->sym;
+        break;
+      }
+      case INT: {
+        if (equalp(i)) return &p->sym;
+        break;
+      }
+      case UNSIGNED: {
+        if (equalp(u)) return &p->sym;
+        break;
+      }
+      case FLOAT: {
+        if (equalp(f)) return &p->sym;
+        break;
+      }
+      case DOUBLE: {
+        if (equalp(d)) return &p->sym;
+        break;
+      }
+      case ARRAY:
+      case FUNCTION: {
+        break;
+      }
+      case POINTER: {
+        break;
+      }
+      }
+    }
+  }
+  NEW0(p, PERM);
+  p->sym.name = vtoa(ty, v);
+  p->sym.scope = CONSTANTS;
+  p->sym.type = ty;
+  p->sym.sclass = STATIC;
+  p->sym.additional_info.constant_info.val = v;
+  p->link = constants->buckets[h];
+  p->sym.up = constants->all;
+  constants->all = &p->sym;
+  constants->buckets[h] = p;
+  // announce the constant, if necessary (page 49)
+  p->sym.defined = 1;
+  return &p->sym;
+}
+
+char *vtoa(Type ty, Value v) {}
