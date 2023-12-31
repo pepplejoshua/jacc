@@ -67,6 +67,7 @@ struct symbol {
   // symbol flags (p 50)
   unsigned temporary : 1;
   unsigned generated : 1;
+  unsigned defined : 1;
   Type type; // type of the symbol if any
   float ref; // for some symbols, this estimates the number of times a variable is referenced
   union {
@@ -133,6 +134,16 @@ extern Symbol lookup(char *, Table tp);
 extern int genLabel(int);
 extern Symbol findLabel(int);
 extern Symbol constant(Type, Value);
+extern char *vtoa(Type, Value);
+
+
+// token.h
+enum {
+#define xx(a,b,c,d,e,f,g) a=b,
+#define yy(a,b,c,d,e,f,g)
+#include "token.h"
+  LAST
+};
 
 // types.c
 struct type {
