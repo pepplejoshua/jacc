@@ -61,6 +61,7 @@ void exitScope() {
   --level;
 }
 
+// install a name
 Symbol install(char *name, Table *tpp, int level, int arena) {
   Table tp = *tpp; // deref tpp to get the actual table pointer
   struct entry *p;
@@ -83,6 +84,7 @@ Symbol install(char *name, Table *tpp, int level, int arena) {
   return &p->sym;
 }
 
+// look up a name
 Symbol lookup(char *name, Table tp) {
   struct entry *p;
   // compute hash of the symbol name to a restricted range
@@ -170,11 +172,9 @@ Symbol constant(Type ty, Value v) {
         break;
       }
       case ARRAY:
-      case FUNCTION: {
-        break;
-      }
+      case FUNCTION:
       case POINTER: {
-        break;
+        if (equalp(p)) return &p->sym;
       }
       }
     }
@@ -195,3 +195,46 @@ Symbol constant(Type ty, Value v) {
 }
 
 char *vtoa(Type ty, Value v) {}
+
+// since we make use of a lot of integers in the compiler
+// this function installs and announces the integer n
+Symbol intconst(int n) {
+  Value v;
+  v.i = n;
+  return constant(inttype, v);
+}
+
+// generates an identifier and optionally announces it to the backend
+// if it is a global identifier
+Symbol genIdent(int scls, int lvl, Type ty) {
+  Symbol p;
+
+  NEW0(p, lvl >= LOCAL ? FUNC : PERM);
+  // generate a new label and make it a string
+  p->name = stringd(genLabel(1));
+  p->scope = lvl;
+  p->sclass = scls;
+  p->type = ty;
+  p->generated = 1;
+  if (lvl == GLOBAL) {
+    (*IR->defSymbol)(p);
+  }
+  return p;
+}
+
+// used to generate typed temporaries (e.g. for spilling registers)
+Symbol temporary(int scls, Type ty, int lev) {
+  Symbol p = genIdent(scls, ty, lev);
+  p->temporary = 1;
+  return p;
+}
+
+// used to generate a backend temporary (untyped since backend has no idea of types)
+// it takes a type suffix to reify the type from
+Symbol newTemp(int scls, int type_suffix) {
+  Symbol p = temporary(scls, btot(type_suffix), LOCAL);
+
+  (*IR->local)(p);
+  p->defined = 1;
+  return p;
+}

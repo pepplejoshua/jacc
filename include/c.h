@@ -21,6 +21,12 @@ extern void *new_array(unsigned long m, unsigned long n, unsigned a);
 #define NEW0(p, a) memset(NEW((p), (a)), 0, sizeof *(p))
 #define mem_align(x) roundup(x, sizeof(union align))
 
+// interface
+typedef struct interface {
+  void (*defSymbol) (Symbol);
+  void (*local)(Symbol);
+} Interface;
+extern Interface *IR;
 
 // lex.c
 extern Coordinate src;
@@ -135,7 +141,10 @@ extern int genLabel(int);
 extern Symbol findLabel(int);
 extern Symbol constant(Type, Value);
 extern char *vtoa(Type, Value);
-
+extern Symbol intconst(int);
+extern Symbol genIdent(int, int, Type);
+extern Symbol temporary(int, Type, int);
+extern Symbol newTemp(int, int);
 
 // token.h
 enum {
@@ -145,11 +154,14 @@ enum {
   LAST
 };
 
+
 // types.c
 struct type {
   int op;
 };
 typedef struct type *Type;
+extern Type inttype;
+extern Type btot(int);
 
 // returns the length of an array by dividing the overall size by the size of one elem
 #define NELEMS(a) ((int) (sizeof (a) / sizeof ((a)[0])))
