@@ -238,3 +238,22 @@ Symbol newTemp(int scls, int type_suffix) {
   p->defined = 1;
   return p;
 }
+
+// track a new Coordinate for where Symbol is used
+void use(Symbol p, Coordinate src) {
+  // allocate src
+  Coordinate *n_src;
+  NEW(n_src, PERM);
+  // point it to src
+  *n_src = src;
+
+  // update p->src by appending n_src
+  p->uses = append(n_src, p->uses);
+}
+
+// add tp->all to symbols List
+// add src to loci List
+void locus(Table tp, Coordinate *src) {
+  loci = append(src, loci);
+  symbols = append(tp->all, symbols);
+}

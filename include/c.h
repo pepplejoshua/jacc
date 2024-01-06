@@ -3,7 +3,6 @@
 // exported macros
 #define VARARGS(newlist, oldlist, olddecls) newlist
 #define NULL ((void*)0) // machine-independent expression of a nullptr
-#define nullptr NULL // ditto
 
 // prototypes and types implemented across files
 
@@ -131,6 +130,11 @@ extern Table labels; // compiler defined internal labels
 extern Table types; // type tags
 extern int level;
 
+// loci tracks the Coordinates for corresponding Symbols in symbols List
+// symbols holds the end node of a list of symbols visible from corresponding
+// coordinate in loci
+extern List loci, symbols;
+
 extern Table new_table(Table, int);
 extern void foreach(Table, int, void(*)(Symbol, void *), void *);
 extern void enterScope();
@@ -145,6 +149,8 @@ extern Symbol intconst(int);
 extern Symbol genIdent(int, int, Type);
 extern Symbol temporary(int, Type, int);
 extern Symbol newTemp(int, int);
+extern void use(Symbol, Coordinate);
+extern void locus(Table, Coordinate *);
 
 // token.h
 enum {
